@@ -4,4 +4,4 @@ ctrl - roll \
 shift - run \
 shift + ctrl + move - slide 
  
-the white all to the right can be climbed 
+the white wall to the right can be climbed 
