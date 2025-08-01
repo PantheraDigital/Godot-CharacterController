@@ -13,11 +13,9 @@ func _process(_delta: float) -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		return
 	
-	var move_direction: Vector3 = Vector3.ZERO
-	move_direction.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-	move_direction.z = Input.get_action_strength("move_backwards") - Input.get_action_strength("move_forwards")
-	move_direction = move_direction.rotated(Vector3.UP, _spring_arm_pivot.rotation.y)
-	_action_container.play_action("MOVE", {"direction":move_direction, "speed":_character.variables.speed})
+	var move_vector: Vector2 = Input.get_vector("move_left", "move_right", "move_forwards", "move_backwards")
+	move_vector = move_vector.rotated(-_spring_arm_pivot.rotation.y)
+	_action_container.play_action("MOVE", {"direction":Vector3(move_vector.x, 0, move_vector.y), "speed":_character.variables.speed})
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:

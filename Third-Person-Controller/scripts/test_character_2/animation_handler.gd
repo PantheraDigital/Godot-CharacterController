@@ -36,11 +36,28 @@ func animate() -> void:
 			_animation_tree.set("parameters/transition_ground_to_fall/transition_request", "fall")
 
 
-var play_override_animation_lambda : Callable = func () -> void : _animation_tree.set("parameters/override_node/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
-func play_override_animation(anim_path : String, override_node : StringName = "anim_node_override", anim_trigger_lambda : Callable = play_override_animation_lambda) -> void:
+func play_override_animation(anim_path : String, override_node : StringName = "anim_node_override", \
+		anim_trigger_lambda : Callable = func () -> void : _animation_tree.set("parameters/override_node/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE) \
+		) -> void:
 	_animation_tree.get_tree_root().get_node(override_node).animation = anim_path
 	anim_trigger_lambda.call()
 
+func play_collider_crouch(reverse : bool = false) -> void:
+	if (reverse and _animation_tree.get("parameters/TimeScale/scale") == -1.0) or \
+			(!reverse and _animation_tree.get("parameters/TimeScale/scale") == 1.0):
+		return
+	
+	if reverse:
+		_animation_tree.set("parameters/TimeScale/scale", -1.0)
+	else:
+		_animation_tree.set("parameters/TimeScale/scale", 1.0)
+		
+	_animation_tree.set("parameters/add_collider_change/add_amount", 1.0)
+	_animation_tree.animation_finished.connect(\
+		func(anim_name: StringName):
+		if anim_name == "Collider/Crouch":
+			_animation_tree.set("parameters/add_collider_change/add_amount", 0.0)
+		)
 
 func _on_action_enter(_action_id: StringName) -> void:
 	# this helps prevent errors for if a step up is interrupted by an action before the character touches the ground

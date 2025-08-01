@@ -23,12 +23,8 @@ var mesh_faces_camera_direction: bool = false
 ## this script should stay the same. only the scripts on some nodes should change to swap states
 
 func _ready() -> void:
-	if auto_rotate: 
-		if mesh_faces_camera_direction:
-			var cam_forward : Vector3 = _spring_arm_pivot.get_cam_forward()
-			face_point(cam_forward)
-		else:
-			face_point(_mesh.basis.z)
+	if auto_rotate and !_mesh.basis.z.is_equal_approx(_collision_shape_3d.basis.z): 
+		face_point(_mesh.basis.z)
 
 func _process(_delta: float) -> void:
 	# face camera rotation
@@ -37,21 +33,11 @@ func _process(_delta: float) -> void:
 			var cam_forward : Vector3 = _spring_arm_pivot.get_cam_forward()
 			face_point(cam_forward, LERP_VALUE)
 		else:
-			if velocity.length_squared() != 0.0:
+			if !is_equal_approx(velocity.length_squared(), 0.0) and _movement_class._input_vector != Vector3.ZERO:
 				face_point(velocity, LERP_VALUE)
 	
 	_animation_handler.animate()
 
-
-func set_collider_height_small() -> void:
-	# values set in inspector then coppied here manually
-	_collision_shape_3d.shape.height = 1.0
-	_collision_shape_3d.position.y = 0.5
-
-func set_collider_height_normal() -> void:
-	# values set in inspector then coppied here manually
-	_collision_shape_3d.shape.height = 1.843
-	_collision_shape_3d.position.y = 0.909
 
 # runs in local space
 # only uses x and z of point
@@ -59,13 +45,14 @@ func face_point(point: Vector3, lerp_value : float = 0.0) -> void:
 	if point.is_equal_approx(Vector3.ZERO):
 		return
 	
-	if !is_equal_approx(lerp_value, 0.0):
-		if point != _mesh.position:
+	if point != _mesh.position:
+		if !is_equal_approx(lerp_value, 0.0):
 			_mesh.rotation.y = lerp_angle(_mesh.rotation.y, atan2(point.x, point.z), lerp_value)
-		if point != _collision_shape_3d.position:
-			_collision_shape_3d.rotation.y = lerp_angle(_collision_shape_3d.rotation.y, atan2(point.x, point.z), lerp_value)
-	else:
-		if point != _mesh.position:
+		else:
 			_mesh.transform = _mesh.transform.looking_at(Vector3(point.x, _mesh.position.y, point.z), Vector3.UP, true)
-		if point != _collision_shape_3d.position:
+	
+	if point != _collision_shape_3d.position:
+		if !is_equal_approx(lerp_value, 0.0):
+			_collision_shape_3d.rotation.y = lerp_angle(_collision_shape_3d.rotation.y, atan2(point.x, point.z), lerp_value)
+		else:
 			_collision_shape_3d.transform = _collision_shape_3d.transform.looking_at(Vector3(point.x, _collision_shape_3d.position.y, point.z), Vector3.UP, true)

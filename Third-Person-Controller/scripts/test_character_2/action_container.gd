@@ -18,19 +18,27 @@ func _ready() -> void:
 
 
 func play_action(action_name : StringName, params: Dictionary = {}) -> void:
-	if action_name in _action_dict:
-		if !_active_action.is_empty() and !_action_dict[_active_action].interrupt_whitelist.has(action_name):
-			return
+	if action_name not in _action_dict:
+		return
 	
-		if _action_dict[action_name].IS_LAYERED:
-			if _action_dict[action_name].can_play():
-				_action_dict[action_name].play(params)
-		else:
-			if _action_dict[action_name].can_play():
-				if _active_action:
-					_action_dict[_active_action].stop()
-				_active_action = action_name
-				_action_dict[action_name].play(params)
+	var action = _action_dict[action_name]
+	
+	if !_active_action.is_empty() and !_action_dict[_active_action].interrupt_whitelist.has(action_name):
+		return
+	
+	if !action.can_play():
+		return
+	
+	if action.IS_LAYERED:
+		action.play(params)
+		return
+	
+	if _active_action:
+		_action_dict[_active_action].stop()
+	
+	_active_action = action_name
+	action.play(params)
+
 
 func stop_action(action_name : StringName) -> void:
 	if action_name in _action_dict:

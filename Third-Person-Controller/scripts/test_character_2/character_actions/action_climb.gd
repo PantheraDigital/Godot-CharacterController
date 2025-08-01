@@ -13,15 +13,29 @@ func can_play() -> bool:
 	return true # trusting in movement_class to call at the right time
 
 func play(ledge_data: Dictionary = {}) -> void:
-	# this is a two part animation
-	# the second is triggered in the animation. alternatively this may be done in _on_animation_tree_animation_finished
+	if !ledge_data:
+		return
 	
 	# force character to face wall
 	_character.auto_rotate = false
-	if ledge_data: 
+	
+	if ledge_data.has("ray_cast_normal"): 
 		_character.face_point(-ledge_data["ray_cast_normal"])
+		# this is a two part animation
+		# the second is triggered in the animation. alternatively this may be done in _on_animation_tree_animation_finished
+		_animation_handler.play_override_animation("Ledge/Jump-ToLedge")
+		
+	elif ledge_data.has("step_point"):
+		var query = PhysicsRayQueryParameters3D.create(_character.global_position, Vector3(ledge_data["step_point"].x, ledge_data["step_point"].y - 0.01, ledge_data["step_point"].z))
+		query.exclude = [_character.get_rid()]
+		var query_result: Dictionary = _character.get_world_3d().direct_space_state.intersect_ray(query)
+		if query_result:
+			_character.face_point(-query_result["normal"])
+			_animation_handler.play_override_animation("Ledge/Climb-UpLedge")
+	else:
+		return
+	
 	_character.velocity = Vector3.ZERO
-	_animation_handler.play_override_animation("Ledge/Jump-ToLedge")
 	super.play()
 		
 		
@@ -33,7 +47,6 @@ func play(ledge_data: Dictionary = {}) -> void:
 	## this action is not directly playable from controller as it is context specific
 
 func stop() -> void:
-	_movement_class.enable_all_movement()
 	_movement_class.disable_gravity = false
 	_character.auto_rotate = true
 	super.stop()

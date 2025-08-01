@@ -28,11 +28,9 @@ func play(_params: Dictionary = {}) -> void:
 
 func stop() -> void: 
 	# clean up any changes if action is interrupted 
-	_character.set_collider_height_normal()
-	if _roll:
-		_movement_class.enabled_movement(_movement_class.EnabledMovement.MOVE)
-	else:
-		_movement_class.enabled_movement(_movement_class.EnabledMovement.MOVE | _movement_class.EnabledMovement.STEP)
+	_animation_handler.play_collider_crouch(true)
+	if !_roll:
+		_movement_class.enabled_movement(_movement_class.EnabledMovement.STEP)
 	super.stop()
 
 
