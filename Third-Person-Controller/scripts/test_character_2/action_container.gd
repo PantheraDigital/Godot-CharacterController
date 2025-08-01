@@ -41,12 +41,13 @@ func play_action(action_name : StringName, params: Dictionary = {}) -> void:
 
 
 func stop_action(action_name : StringName) -> void:
-	if action_name in _action_dict:
-		if _action_dict[action_name].IS_LAYERED:
-			_action_dict[action_name].stop()
-		else:
-			if action_name == _active_action:
-				_action_dict[_active_action].stop()
+	if action_name not in _action_dict:
+		return
+	
+	if _action_dict[action_name].IS_LAYERED:
+		_action_dict[action_name].stop()
+	elif action_name == _active_action:
+		_action_dict[_active_action].stop()
 
 
 func _on_action_exit(action_id : StringName) -> void:

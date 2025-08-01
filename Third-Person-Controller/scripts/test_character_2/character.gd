@@ -44,15 +44,13 @@ func _process(_delta: float) -> void:
 func face_point(point: Vector3, lerp_value : float = 0.0) -> void:
 	if point.is_equal_approx(Vector3.ZERO):
 		return
-	
-	if point != _mesh.position:
-		if !is_equal_approx(lerp_value, 0.0):
-			_mesh.rotation.y = lerp_angle(_mesh.rotation.y, atan2(point.x, point.z), lerp_value)
-		else:
-			_mesh.transform = _mesh.transform.looking_at(Vector3(point.x, _mesh.position.y, point.z), Vector3.UP, true)
-	
-	if point != _collision_shape_3d.position:
-		if !is_equal_approx(lerp_value, 0.0):
-			_collision_shape_3d.rotation.y = lerp_angle(_collision_shape_3d.rotation.y, atan2(point.x, point.z), lerp_value)
-		else:
-			_collision_shape_3d.transform = _collision_shape_3d.transform.looking_at(Vector3(point.x, _collision_shape_3d.position.y, point.z), Vector3.UP, true)
+	_rotate_to_point(_mesh, point, lerp_value)
+	_rotate_to_point(_collision_shape_3d, point, lerp_value)
+
+func _rotate_to_point(node: Node3D, point: Vector3, lerp_value: float = 0.0) -> void:
+	if point == node.position or point.is_equal_approx(Vector3.ZERO):
+		return
+	if !is_equal_approx(lerp_value, 0.0):
+		node.rotation.y = lerp_angle(node.rotation.y, atan2(point.x, point.z), lerp_value)
+	else:
+		node.transform = node.transform.looking_at(Vector3(point.x, node.position.y, point.z), Vector3.UP, true)

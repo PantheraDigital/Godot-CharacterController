@@ -20,7 +20,7 @@ const CAMERA_BLEND : float = 0.05
 
 func _ready() -> void:
 	# prevent spring arm from colliding with owning character
-	spring_arm.add_excluded_object($"..".get_rid()) 
+	spring_arm.add_excluded_object(get_parent().get_rid()) 
 	
 	if auto_set_len:
 		spring_arm.spring_length = spring_arm.global_position.distance_to(camera.global_position)

@@ -169,15 +169,13 @@ static func snapped_intersect_ray(space_state : PhysicsDirectSpaceState3D, origi
 	var height : float = stabilizer_height + slope_adjustment + VERTICAL_EXTENSION
 	var C : Vector3 = Vector3(B.x, B.y - height, B.z)
 	DebugDraw3D.draw_line(B, C)
-	query = PhysicsRayQueryParameters3D.create(B,C)
-	query.exclude = exclude
+	query = PhysicsRayQueryParameters3D.create(B,C, 0xFFFFFFFF, exclude)
 	var front_result : Dictionary = space_state.intersect_ray(query)
 	
 	# back stabilizer ray
 	var X : Vector3 = Vector3(A.x, A.y - height, A.z)
 	DebugDraw3D.draw_line(A, X)
-	query = PhysicsRayQueryParameters3D.create(A,X)
-	query.exclude = exclude
+	query = PhysicsRayQueryParameters3D.create(A,X, 0xFFFFFFFF, exclude)
 	var back_result : Dictionary = space_state.intersect_ray(query)
 	
 	# floor aligned ray
@@ -191,6 +189,5 @@ static func snapped_intersect_ray(space_state : PhysicsDirectSpaceState3D, origi
 		return {"error":"stabilizer leg fail"} # trouble aligning 
 	
 	DebugDraw3D.draw_ray(start, ((start + (dir * length)) - start).normalized(), length, Color.AQUA)
-	query = PhysicsRayQueryParameters3D.create(start, start + (dir * length))
-	query.exclude = exclude
+	query = PhysicsRayQueryParameters3D.create(start, start + (dir * length), 0xFFFFFFFF, exclude)
 	return space_state.intersect_ray(query)

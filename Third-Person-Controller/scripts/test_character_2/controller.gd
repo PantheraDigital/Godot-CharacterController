@@ -3,7 +3,7 @@ extends Node
 ## provides input to Character
 ## example of player controller
 
-@onready var _character: CharacterBody3D = $".."
+@onready var _character: CharacterBody3D = get_parent()
 @onready var _spring_arm_pivot: Node3D = $"../SpringArmPivot"
 @onready var _action_container: ActionContainer = $"../ActionContainer"
 
